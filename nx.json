@@ -5,7 +5,8 @@
     "package.json": "*",
     "tsconfig.json": "*",
     "tslint.json": "*",
-    "nx.json": "*"
+    "nx.json": "*",
+    ".gitlab-ci.yml": "*"
   },
   "projects": {
     "react-app": {
