@@ -1,0 +1,91 @@
+image: node:12.16.3-alpine3.11
+
+variables:
+  CYPRESS_CACHE_FOLDER: "cache/Cypress"
+
+before_script:
+  - apk add git
+  - git fetch --no-tags --progress $CI_REPOSITORY_URL +refs/heads/master:refs/master
+
+stages:
+  - setup
+  - distributed-tasks
+
+install:deps:
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+      - cache/Cypress
+      - .yarn
+    policy: pull-push
+  stage: setup
+  interruptible: true
+  script:
+    - yarn install --pure-lockfile --cache-folder .yarn
+  artifacts:
+    paths:
+      - node_modules
+      - cache/Cypress
+
+.distributed:
+  stage: distributed-tasks
+  interruptible: true
+  except:
+    variables:
+      - $JOB_DEPLOY_TO
+
+format:
+  extends: .distributed
+  script:
+    - CI_BASE_SHA=$([[ "$CI_COMMIT_REF_SLUG" == "master" ]] && echo "master~1" || echo "master")
+    - yarn format:check --base=$CI_BASE_SHA
+
+lint:
+  extends: .distributed
+  parallel: 6
+  script:
+    - node ./tools/scripts/run-many.js lint $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG
+  artifacts:
+    paths:
+      - node_modules/.cache/nx
+
+test:
+  extends: .distributed
+  parallel: 6
+  script:
+    - node ./tools/scripts/run-many.js test $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG --parallel
+  artifacts:
+    paths:
+      - node_modules/.cache/nx
+    reports:
+      junit: report/unit/**/*.xml
+      cobertura: coverage/**/cobertura-coverage.xml
+
+e2e:
+  extends: .distributed
+  parallel: 3
+  image: cypress/base:12.16.2
+  allow_failure: true
+  before_script:
+    - apt-get install git
+    - git fetch --no-tags --progress $CI_REPOSITORY_URL +refs/heads/master:refs/master
+  script:
+    - node ./tools/scripts/run-many.js e2e 1 1 $CI_COMMIT_REF_SLUG
+  artifacts:
+    paths:
+      - node_modules/.cache/nx
+      - dist/cypress/**/*.mp4
+      - dist/cypress/**/*.png
+
+build:
+  extends: .distributed
+  parallel: 3
+  script:
+    - node ./tools/scripts/run-many.js build $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG --prod
+  artifacts:
+    paths:
+      - node_modules/.cache/nx
+      - dist
