@@ -17,23 +17,26 @@ import { ReactLib14 } from '@happyorg/react/lib14';
 
 export const App = () => {
   return (
-    <div>
-      <ReactLib0></ReactLib0>
-      <ReactLib1></ReactLib1>
-      <ReactLib2></ReactLib2>
-      <ReactLib3></ReactLib3>
-      <ReactLib4></ReactLib4>
-      <ReactLib5></ReactLib5>
-      <ReactLib6></ReactLib6>
-      <ReactLib7></ReactLib7>
-      <ReactLib8></ReactLib8>
-      <ReactLib9></ReactLib9>
-      <ReactLib10></ReactLib10>
-      <ReactLib11></ReactLib11>
-      <ReactLib12></ReactLib12>
-      <ReactLib13></ReactLib13>
-      <ReactLib14></ReactLib14>
-    </div>
+    <>
+      <h1>Welcome to react-app!</h1>
+      <div>
+        <ReactLib0></ReactLib0>
+        <ReactLib1></ReactLib1>
+        <ReactLib2></ReactLib2>
+        <ReactLib3></ReactLib3>
+        <ReactLib4></ReactLib4>
+        <ReactLib5></ReactLib5>
+        <ReactLib6></ReactLib6>
+        <ReactLib7></ReactLib7>
+        <ReactLib8></ReactLib8>
+        <ReactLib9></ReactLib9>
+        <ReactLib10></ReactLib10>
+        <ReactLib11></ReactLib11>
+        <ReactLib12></ReactLib12>
+        <ReactLib13></ReactLib13>
+        <ReactLib14></ReactLib14>
+      </div>
+    </>
   );
 };
 
