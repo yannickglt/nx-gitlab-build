@@ -33,9 +33,9 @@ install:deps:
 .distributed:
   stage: distributed-tasks
   interruptible: true
-  except:
-    variables:
-      - $JOB_DEPLOY_TO
+  artifacts:
+    paths:
+      - node_modules/.cache/nx
 
 format:
   extends: .distributed
@@ -45,35 +45,26 @@ format:
 
 lint:
   extends: .distributed
-  parallel: 6
+  parallel: 8
   script:
     - node ./tools/scripts/run-many.js lint $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG
-  artifacts:
-    paths:
-      - node_modules/.cache/nx
 
 test:
   extends: .distributed
-  parallel: 6
+  parallel: 8
   script:
     - node ./tools/scripts/run-many.js test $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG --parallel
-  artifacts:
-    paths:
-      - node_modules/.cache/nx
-    reports:
-      junit: report/unit/**/*.xml
-      cobertura: coverage/**/cobertura-coverage.xml
 
 e2e:
   extends: .distributed
-  parallel: 3
+  parallel: 2
   image: cypress/base:12.16.2
   allow_failure: true
   before_script:
     - apt-get install git
     - git fetch --no-tags --progress $CI_REPOSITORY_URL +refs/heads/master:refs/master
   script:
-    - node ./tools/scripts/run-many.js e2e 1 1 $CI_COMMIT_REF_SLUG
+    - node ./tools/scripts/run-many.js e2e $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG
   artifacts:
     paths:
       - node_modules/.cache/nx
@@ -82,7 +73,7 @@ e2e:
 
 build:
   extends: .distributed
-  parallel: 3
+  parallel: 2
   script:
     - node ./tools/scripts/run-many.js build $CI_NODE_INDEX $CI_NODE_TOTAL $CI_COMMIT_REF_SLUG --prod
   artifacts:
