@@ -51,7 +51,7 @@ Nx knows what is affected by your PR, so it doesn't have to test/build/lint ever
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx-azure-build/master/readme-assets/graph-one-affected.png" width="800"></p>
 
-If you update `azure-pipelines.yml` to use `nx affected` instead of `nx run-many`:
+If you update `.gitlab-ci.yml` to use `nx affected` instead of `nx run-many`:
 
 ```yaml
 ci:
